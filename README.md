@@ -19,9 +19,11 @@ Adjusts economy using match-phase-based weighting.
 Confidence score based on number of balls bowled.
 
 4. Input Fields and Data Types:
+   
 Request Model: EconomyInput
 
-Field	Type	Description
+
+-> Field	Type	Description
 
 bowler.runs_conceded	float	Runs conceded by the bowler
 
@@ -38,7 +40,8 @@ population[].balls_bowled	float	Balls bowled
 population[].phase	string	Match phase
 
 5. Derived Variables and Their Meaning:
-Variable	Meaning
+   
+-> Variable	Meaning:
 p (Bowler Economy)	Runs per over of the bowler
 
 p_adjusted	Economy adjusted using phase weight
@@ -53,7 +56,8 @@ confidence_score	Indicates reliability based on sample size
 
 
 6. Final Output Fields and Their Meaning:
-Field	Description
+   
+-> Field	Description
 
 bowler_economy	Raw economy rate
 
@@ -71,6 +75,7 @@ interpretation	Human-readable performance category
 
 
 7. Example Request:
+   
 {
 
   "bowler": {
@@ -97,6 +102,7 @@ interpretation	Human-readable performance category
 
 
 8. Example Response:
+   
 {
 
   "bowler_economy": 7.0,
@@ -117,6 +123,7 @@ interpretation	Human-readable performance category
 
 
 9. Validation Errors:
+    
 balls_bowled <= 0 → Invalid input
 
 population size < 2 → Insufficient comparison data
