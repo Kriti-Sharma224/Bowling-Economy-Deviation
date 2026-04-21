@@ -9,40 +9,40 @@ from utils import (
 
 def calculate_economy_deviation(payload: EconomyInput):
 
-    bowler = payload.bowler
-    population = payload.population
+    # Convert Pydantic → dict
+    bowler = payload.bowler.model_dump()
+    population = [b.model_dump() for b in payload.population]
 
     validate_population(population)
 
     # --- Bowler Economy ---
-    base_economy = calculate_economy(bowler.runs_conceded, bowler.balls_bowled)
+    base_economy = calculate_economy(
+        bowler["runs_conceded"], bowler["balls_bowled"]
+    )
 
-    # Apply phase weight
-    weight = get_phase_weight(bowler.phase)
+    weight = get_phase_weight(bowler["phase"])
     adjusted_economy = base_economy * weight
 
-    # --- Population Economies ---
+    # --- Population ---
     population_economies = []
     for b in population:
-        econ = calculate_economy(b.runs_conceded, b.balls_bowled)
-        econ *= get_phase_weight(b.phase)
+        econ = calculate_economy(b["runs_conceded"], b["balls_bowled"])
+        econ *= get_phase_weight(b["phase"])
         population_economies.append(econ)
 
-    # --- Derived Variables ---
     population_mean = calculate_mean(population_economies)
-    population_spread = calculate_sample_std_dev(population_economies, population_mean)
+    population_spread = calculate_sample_std_dev(
+        population_economies, population_mean
+    )
 
-    # --- Deviation Score ---
     if population_spread == 0:
         deviation_score = 0
     else:
         deviation_score = (population_mean - adjusted_economy) / population_spread
 
-    # --- Confidence Score (based on balls bowled) ---
-    balls = bowler.balls_bowled
-    confidence_score = min(balls / 60, 1.0)  # normalized (10 overs = high confidence)
+    confidence_score = min(bowler["balls_bowled"] / 60, 1.0)
 
-    # --- Interpretation ---
+    # Interpretation
     if deviation_score > 1.5:
         interpretation = "Elite performance"
     elif deviation_score > 0.5:
